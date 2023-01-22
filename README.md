@@ -1,10 +1,13 @@
 # reversi
 
+⚫️⚪️\
+⚪️⚫️
+
 A recreation of the game "Reversi" (also known as Othello).
 
-https://en.wikipedia.org/wiki/Reversi
+<https://en.wikipedia.org/wiki/Reversi>
 
-I wanted to familiarize myself with TypeScript, React, and WebSockets. The application is split into separate client and server sections.
+Node, TypeScript, React, and WebSockets. The application is split into separate client and server sections.
 
 ## Install
 
