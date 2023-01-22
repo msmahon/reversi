@@ -1,1 +1,6 @@
 **/node_modules
+server/dist
+.env
+client/build
+*.db
+.DS_store
