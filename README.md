@@ -7,7 +7,8 @@ A recreation of the game "Reversi" (also known as Othello).
 
 <https://en.wikipedia.org/wiki/Reversi>
 
-Node, TypeScript, React, and WebSockets. The application is split into separate client and server sections.
+Front: React (TypeScript), Tailwind
+Back: Node (TypeScript), SQLite
 
 ## Install
 

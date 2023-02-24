@@ -13,6 +13,7 @@ export interface gameData {
     remaining: number,
     size: number,
     activityLog: gameLog[]
+    winner: 0|1|null|false
 }
 
 export interface gameLog {

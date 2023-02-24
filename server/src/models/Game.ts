@@ -5,17 +5,18 @@ import { v4 as uuidv4 } from 'uuid'
 import { gameData as gameDataType, gameLog as gameLogType, token as TokenObject } from '../types'
 const db = new database('reversi.db')
 
+const alpha = [...Array(26)].map((_, i) => String.fromCharCode(i + 65))
 export default class Game {
     id: string|null
+    player_0_id: string|null
     player_1_id: string|null
-    player_2_id: string|null
     board: Token[][]
     turn: 0|1
 
     constructor () {
         this.id = null
+        this.player_0_id = null
         this.player_1_id = null
-        this.player_2_id = null
         this.board = []
         this.turn = 1
     }
@@ -37,7 +38,7 @@ export default class Game {
             statement = db.prepare('UPDATE games SET game_status = ?, turn = ? WHERE id = ?')
                 .run(JSON.stringify(this.board), this.turn, this.id)
         } else {
-            statement = db.prepare('INSERT INTO games (id, player_1_id, player_2_id, game_status) VALUES (?, ?, ?, ?)')
+            statement = db.prepare('INSERT INTO games (id, player_0_id, player_1_id, game_status) VALUES (?, ?, ?, ?)')
             const uuid = uuidv4();
             statement.run(uuid, uuidv4(), uuidv4(), JSON.stringify(this.board))
             this.id = uuid
@@ -51,11 +52,11 @@ export default class Game {
      * @returns this
      */
     open(id: string) : this {
-        const result = db.prepare('SELECT * FROM games WHERE id = ? OR player_1_id = ? OR player_2_id = ?').get([id, id, id])
+        const result = db.prepare('SELECT * FROM games WHERE id = ? OR player_0_id = ? OR player_1_id = ?').get([id, id, id])
         if (result.id) {
             this.id = result.id
+            this.player_0_id = result.player_0_id
             this.player_1_id = result.player_1_id
-            this.player_2_id = result.player_2_id
             this.turn = result.turn
             this.board = JSON.parse(result.game_status)
                 .map((row: TokenObject[]) => {
@@ -90,20 +91,21 @@ export default class Game {
         return db.prepare('SELECT * FROM activity_log WHERE game_id = ?').all(this.id)
     }
 
-    getPlayerNumber (id: string) : 0|1 {
-        const result = <{id: string, player: 0|1}> db.prepare(`
+    getPlayerNumberFromId (id: string) : 0|1 {
+        const result = db.prepare(`
             SELECT
                 id,
                 CASE ?
-                    WHEN player_1_id THEN 0
-                    WHEN player_2_id THEN 1
+                    WHEN player_0_id THEN 0
+                    WHEN player_1_id THEN 1
                 END as player
-            FROM games WHERE ((player_1_id = ? AND turn = 0) OR (player_2_id = ? AND turn = 1))
+            FROM games WHERE ((player_0_id = ? AND turn = 0) OR (player_1_id = ? AND turn = 1))
         `).get([id, id, id])
         return result.player
     }
 
-    play (row: number, column: number, turn: number): boolean {
+    play (row: number, column: number, id: string): boolean {
+        let turn = this.getPlayerNumberFromId(id)
         if (turn !== this.turn) {
             throw new Error('It is not your turn')
         }
@@ -118,16 +120,15 @@ export default class Game {
         }
         this.turn = this.turn == 0 ? 1 : 0
         this.mergePlayableMoves(this.turn)
-        this.save()
-
-        return true
+        this.logPlayerAction(this.turn, `played @ ${alpha[column]}${row + 1}`)
+        return this.save()
     }
 
-    printWinner (boardStatus: {player1: number, player0: number, playersTurn: string, remaining: number, size: number}) {
-        if (boardStatus.player1 > boardStatus.player0) {
+    printWinner (player1Score: number, player0Score: number) {
+        if (player1Score > player0Score) {
             console.log('Player 1 wins')
             return 1
-        } else if (boardStatus.player0 > boardStatus.player1) {
+        } else if (player0Score > player1Score) {
             console.log('Player 2 wins')
             return 0
         }
@@ -135,13 +136,14 @@ export default class Game {
         return null
     }
 
-    checkForWinner () {
-        const boardStatus = this.getGameStatus()
-        if (boardStatus.remaining === 0) {
-            return this.printWinner(boardStatus)
+    checkForWinner (player0Score: number, player1Score: number, remaining: number) {
+        if (remaining === 0) {
+            this.logPlayerAction(this.turn, 'Game over')
+            return this.printWinner(player1Score, player0Score)
         }
         if (this.getPlayableMoves(0).length === 0 && this.getPlayableMoves(1).length === 0) {
-            return this.printWinner(boardStatus)
+            this.logPlayerAction(this.turn, 'No more playable moves')
+            return this.printWinner(player1Score, player0Score)
         }
         return false
     }
@@ -150,20 +152,25 @@ export default class Game {
         if (this.board === null) {
             throw new Error('Board not yet created')
         }
-        if (this.id === null || this.player_1_id === null || this.player_2_id === null) {
+        if (this.id === null || this.player_0_id === null || this.player_1_id === null) {
             throw new Error('You must open the board first')
         }
         const score1 = this.countScore(1)
         const score0 = this.countScore(0)
         const size = this.getSize()
+        const remaining = Math.pow(size, 2) - (score1 + score0)
+
+        const winner = this.checkForWinner(score0, score1, remaining)
+
         return {
             player1: score1,
             player0: score0,
-            playersTurn: this.turn === 1 ? this.player_2_id : this.player_1_id,
-            tokenColor: this.turn === 1 ? 'Black' : 'White',
-            remaining: Math.pow(size, 2) - (score1 + score0),
+            playersTurn: this.turn === 1 ? this.player_1_id : this.player_0_id,
+            tokenColor: this.turn === 1 ? 'White' : 'Black',
+            remaining: remaining,
             size: size,
             activityLog: this.getActivityLog(),
+            winner: winner,
         }
     }
 

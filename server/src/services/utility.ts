@@ -7,8 +7,8 @@ export default {
         db.exec('DROP TABLE IF EXISTS games')
         db.exec(`CREATE TABLE games (
             id TEXT PRIMARY KEY NOT NULL,
+            player_0_id TEXT NOT NULL,
             player_1_id TEXT NOT NULL,
-            player_2_id TEXT NOT NULL,
             turn TINYINT DEFAULT 1,
             game_status TEXT,
             created TEXT DEFAULT (DATETIME('now'))

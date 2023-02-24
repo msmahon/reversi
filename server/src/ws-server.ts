@@ -2,7 +2,7 @@ import WebSocket, { WebSocketServer } from 'ws'
 import url from 'url'
 import database from 'better-sqlite3'
 const db = new database('reversi.db')
-import { gameData } from './types'
+import Game from './models/Game'
 
 var ws: WebSocketServer
 var clients: {"uuid": string|string[], "client": WebSocket.WebSocket}[] = []
@@ -19,6 +19,7 @@ export default {
                 }
             }
 
+            // Maybe use this later for full websocket communication
             conn.on('message', (message: {action: string, payload: any}, isBinary) => {
                 console.log('socket inbound: ' + message)
 
@@ -29,23 +30,23 @@ export default {
                     default:
                         break
                 }
-
-
                 ws.clients.forEach(client => {
                     if (client.readyState === WebSocket.OPEN) {
                         client.send('broadcasting data', { binary: isBinary })
                     }
                 });
-
-                conn.send('affirmative response')
             })
         })
         ws.on('listening', () => console.log('websocket server listening on port 8081'))
     },
 
     // Send payload to clients matching the game id or either player id
-    broadcastStatus: (uuid: string, payload: {game_data: gameData, board_data: any}) => {
-        let result = db.prepare('SELECT id, player_1_id, player_2_id FROM games WHERE id = ? OR player_1_id = ? OR player_2_id = ?').all(uuid, uuid, uuid)
+    broadcastStatus: (Game: Game) => {
+        const payload = {
+            board_data: Game.getBoardData(),
+            game_data: Game.getGameStatus()
+        }
+        let result = db.prepare('SELECT id, player_0_id, player_1_id FROM games WHERE id = ?').all(Game.id)
         let clientIds = Object.values(result[0])
         clients.filter(client => clientIds.includes(client.uuid)).forEach(client => {
             if (client.client.readyState === WebSocket.OPEN) {

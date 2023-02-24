@@ -31,32 +31,22 @@ export default {
         const row    = parseInt(value.row)
         const column = parseInt(value.column)
 
+        // Open game
         const Game = new GameClass
         Game.open(id)
-        const player = Game.getPlayerNumber(id)
 
+        // Play turn
         try {
-            Game.play(row, column, player)
+            Game.play(row, column, id)
         } catch (e) {
             if (e instanceof Error) {
                 return res.status(400).send({message: e.message})
             }
             return res.status(400).send({message: 'Something went wrong'})
         }
-        const winner = Game.checkForWinner()
-        if (winner !== false) {
-            // 0 for player 1
-            // 1 for player 2
-            // null for tie
-            return res.status(201).json({winner: winner})
-        } else {
-            const alpha = [...Array(26)].map((_, i) => String.fromCharCode(i + 65))
-            Game.logPlayerAction(player, `played @ ${alpha[column]}${row + 1}`)
-        }
-        WebSocketService.broadcastStatus(id, {
-            board_data: Game.getBoardData(),
-            game_data: Game.getGameStatus()
-        })
+
+        // Broadcast to matching clients
+        WebSocketService.broadcastStatus(Game)
         return res.status(200).send({message: 'success'})
     },
 
@@ -87,7 +77,7 @@ export default {
     },
 
     getGameList: async function (req: Request, res: Response) {
-        const data = db.prepare('SELECT id, player_1_id, player_2_id FROM games').all();
+        const data = db.prepare('SELECT id, player_0_id, player_1_id FROM games').all();
         return res.json(data)
     },
 }

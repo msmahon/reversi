@@ -9,17 +9,19 @@ function App(props: {dataId: string}) {
     let [board, setBoard] = useState<tokenType[][]>([]);
     let [uuid, setUuid] = useState<any>('');
     let [errors, setErrors] = useState<string[]>([]);
+    let [playerData, setPlayerData] = useState<Object>({})
     let [gameData, setGameData] = useState<gameDataType>({
-        player1: 0,
         player0: 0,
+        player1: 0,
         playersTurn: '',
         tokenColor: 'Black',
         remaining: 0,
         size: 8,
-        activityLog: []
+        activityLog: [],
+        winner: false
     });
     let [yourTurn, setYourTurn] = useState<boolean>(false);
-    let [gameList, setGameList] = useState<{id: string, player_1_id: string, player_2_id: string}[]>([]);
+    let [gameList, setGameList] = useState<{id: string, player_0_id: string, player_1_id: string}[]>([]);
 
     const alpha = [...Array(26)].map((_, i) => String.fromCharCode(i + 65))
 
@@ -41,9 +43,19 @@ function App(props: {dataId: string}) {
         let data: any = WebSocketClient.lastJsonMessage
         if (data) {
             setBoard(data.board_data)
+            setPlayerData({
+                player0: {
+                    score: data.game_data.player0,
+                    isPlayersTurn: data.game_data.playersTurn === uuid
+                },
+                player1: {
+                    score: data.game_data.player1,
+                    isPlayersTurn: data.game_data.playersTurn === uuid
+                }
+            })
             setGameData(data.game_data)
         }
-    }, [WebSocketClient.lastJsonMessage])
+    }, [WebSocketClient.lastJsonMessage, uuid])
 
     const fetchBoardStatus = useCallback(() => {
         if (uuid) {
@@ -139,8 +151,8 @@ function App(props: {dataId: string}) {
             <tbody>
                 { gameList.map(game => (<tr key={crypto.randomUUID()}>
                     <td><a className="btn-primary" href={game.id}>Game</a></td>
-                    <td><a className="btn-primary" href={game.player_1_id}>Player 1</a></td>
-                    <td><a className="btn-primary" href={game.player_2_id}>Player 2</a></td>
+                    <td><a className="btn-primary" href={game.player_0_id}>Player 1</a></td>
+                    <td><a className="btn-primary" href={game.player_1_id}>Player 2</a></td>
                 </tr>)) }
             </tbody>
         </table>
@@ -157,12 +169,6 @@ function App(props: {dataId: string}) {
                             <label htmlFor="size">
                                 Board size: <br />
                                 <input name="size" type="text" />
-                            </label>
-                            <br />
-                            <label htmlFor="startingColor">
-                                color: <br />
-                                <input name="color" type="radio" value="black" /> ⚫<br />
-                                <input name="color" type="radio" value="white" /> ⚪
                             </label>
                         </form>
                     </div>
