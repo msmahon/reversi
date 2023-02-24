@@ -166,7 +166,6 @@ export default class Game {
             player1: score1,
             player0: score0,
             playersTurn: this.turn === 1 ? this.player_1_id : this.player_0_id,
-            tokenColor: this.turn === 1 ? 'White' : 'Black',
             remaining: remaining,
             size: size,
             activityLog: this.getActivityLog(),

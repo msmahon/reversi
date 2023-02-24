@@ -14,7 +14,6 @@ function App(props: {dataId: string}) {
         player0: 0,
         player1: 0,
         playersTurn: '',
-        tokenColor: 'Black',
         remaining: 0,
         size: 8,
         activityLog: [],
@@ -133,7 +132,7 @@ function App(props: {dataId: string}) {
         row.map(token => (
             <div key={crypto.randomUUID()} onClick={() => token.value !== null ? null : tokenOnClick(token.row, token.column)}>
                 <span key={crypto.randomUUID()} className="absolute text-xs pl-1 pt-1 text-stone-400">{alpha[token.column]}{token.row + 1}</span>
-                <Token key={crypto.randomUUID()} token={token} tokenColor={gameData.tokenColor || 'Black'} yourTurn={yourTurn}/>
+                <Token key={crypto.randomUUID()} token={token} yourTurn={yourTurn}/>
             </div>
         ))
     ))
@@ -175,20 +174,23 @@ function App(props: {dataId: string}) {
                 </div>
                 <div id="game-status">
                     <div className="flex flex-row gap-4 text-6xl">
-                        <div className={`p-4 rounded-xl outline-4 w-1/2 ${gameData.tokenColor === 'Black' ? 'outline outline-orange-400 bg-orange-300' : 'bg-stone-400'}`}>
+                        <div className={`p-4 rounded-xl outline-4 w-1/2 ${gameData.playersTurn === '0' ? 'outline outline-orange-400 bg-orange-300' : 'bg-stone-400'}`}>
                             ⚫ {gameData.player1}
                             <span className="text-sm">
-                                {((yourTurn && gameData.tokenColor === 'Black') || (!yourTurn && gameData.tokenColor === 'White')) ? '(You)' : ''}
+                                {((yourTurn && gameData.playersTurn === '0') || (!yourTurn && gameData.playersTurn === '1')) ? '(You)' : ''}
                             </span>
                         </div>
-                        <div className={`p-4 rounded-xl outline-4 w-1/2 ${gameData.tokenColor === 'White' ? 'outline outline-orange-400 bg-orange-300' : 'bg-stone-400'}`}>
+                        <div className={`p-4 rounded-xl outline-4 w-1/2 ${gameData.playersTurn === '1' ? 'outline outline-orange-400 bg-orange-300' : 'bg-stone-400'}`}>
                             ⚪ {gameData.player0}
                             <span className="text-sm">
-                                {((yourTurn && gameData.tokenColor === 'White') || (!yourTurn && gameData.tokenColor === 'Black')) ? '(You)' : ''}
+                                {((yourTurn && gameData.playersTurn === '1') || (!yourTurn && gameData.playersTurn === '0')) ? '(You)' : ''}
                             </span>
                         </div>
                     </div>
                     { errors }
+                </div>
+                <div className="float-left">
+                    { gameListLinks() }
                 </div>
                 <div id="move-history">
                     <div className="bg-stone-400 rounded-xl p-4">
@@ -199,9 +201,6 @@ function App(props: {dataId: string}) {
                             </div>
                         </div>
                     </div>
-                </div>
-                <div className="float-left">
-                    { gameListLinks() }
                 </div>
             </div>
 

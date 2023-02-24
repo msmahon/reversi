@@ -1,15 +1,14 @@
 export interface token {
     row: number,
     column: number,
-    value: number|null,
+    value?: 0|1,
     playable?: boolean
 }
 
 export interface gameData {
-    player1: number,
     player0: number,
+    player1: number,
     playersTurn: string,
-    tokenColor: 'Black'|'White',
     remaining: number,
     size: number,
     activityLog: gameLog[]
