@@ -9,7 +9,6 @@ function App(props: {dataId: string}) {
     let [board, setBoard] = useState<tokenType[][]>([]);
     let [uuid, setUuid] = useState<any>('');
     let [errors, setErrors] = useState<string[]>([]);
-    let [playerData, setPlayerData] = useState<Object>({})
     let [gameData, setGameData] = useState<gameDataType>({
         player0: 0,
         player1: 0,
@@ -35,24 +34,12 @@ function App(props: {dataId: string}) {
     }, [props.dataId])
 
     useEffect(() => {
-        setYourTurn(gameData.playersTurn === uuid || false)
-    }, [gameData.playersTurn, uuid])
-
-    useEffect(() => {
+        // Update state from websocket message
         let data: any = WebSocketClient.lastJsonMessage
         if (data) {
             setBoard(data.board_data)
-            setPlayerData({
-                player0: {
-                    score: data.game_data.player0,
-                    isPlayersTurn: data.game_data.playersTurn === uuid
-                },
-                player1: {
-                    score: data.game_data.player1,
-                    isPlayersTurn: data.game_data.playersTurn === uuid
-                }
-            })
             setGameData(data.game_data)
+            setYourTurn(data.game_data.playersTurn === uuid || false)
         }
     }, [WebSocketClient.lastJsonMessage, uuid])
 
@@ -100,39 +87,19 @@ function App(props: {dataId: string}) {
 
     let size = board && board.length;
 
-    const tokenOnClick = (row: number, column: number) => {
-        // socketConnection.sendJsonMessage({
-        //     action: 'play',
-        //     payload: {
-        //         id: uuid,
-        //         row: row,
-        //         column: column,
-        //     }
-        // })
-        fetch(`http://localhost:3001/api/play`, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({
-                    id: uuid,
-                    row: row,
-                    column: column,
-                })
-            })
-            .then(async (response: Response) => {
-                if (! response.ok) {
-                    response.json().then(error => {
-                        setErrors(error.details.map((error: {message: string}) => error.message))
-                    })
-                }
-                // fetchBoardStatus()
-            })
-    }
-
     const tokens = () => board.map(row => (
         row.map(token => (
-            <div key={crypto.randomUUID()} onClick={() => token.value !== null ? null : tokenOnClick(token.row, token.column)}>
-                <span key={crypto.randomUUID()} className="absolute text-xs pl-1 pt-1 text-stone-400">{alpha[token.column]}{token.row + 1}</span>
-                <Token key={crypto.randomUUID()} token={token} yourTurn={yourTurn}/>
+            <div key={crypto.randomUUID()}>
+                <span key={crypto.randomUUID()} className="absolute text-xs pl-1 pt-1 text-stone-400">
+                    {alpha[token.column]}{token.row + 1}
+                </span>
+                <Token
+                    key={crypto.randomUUID()}
+                    uuid={uuid}
+                    token={token}
+                    yourTurn={yourTurn}
+                    errorSetter={setErrors}
+                />
             </div>
         ))
     ))
@@ -175,13 +142,13 @@ function App(props: {dataId: string}) {
                 <div id="game-status">
                     <div className="flex flex-row gap-4 text-6xl">
                         <div className={`p-4 rounded-xl outline-4 w-1/2 ${gameData.playersTurn === '0' ? 'outline outline-orange-400 bg-orange-300' : 'bg-stone-400'}`}>
-                            ⚫ {gameData.player1}
+                            ⚫ {gameData.player0}
                             <span className="text-sm">
                                 {((yourTurn && gameData.playersTurn === '0') || (!yourTurn && gameData.playersTurn === '1')) ? '(You)' : ''}
                             </span>
                         </div>
                         <div className={`p-4 rounded-xl outline-4 w-1/2 ${gameData.playersTurn === '1' ? 'outline outline-orange-400 bg-orange-300' : 'bg-stone-400'}`}>
-                            ⚪ {gameData.player0}
+                            ⚪ {gameData.player1}
                             <span className="text-sm">
                                 {((yourTurn && gameData.playersTurn === '1') || (!yourTurn && gameData.playersTurn === '0')) ? '(You)' : ''}
                             </span>
