@@ -44,9 +44,10 @@ export default function Token({
 
   return (
     <div
-      className={`w-16 h-16 text-center text-5xl pt-2 bg-stone-100 border border-stone-300 shadow-inner shadow-stone-400 ${
-        playable && playableClasses
-      }`}
+      className={
+        "w-16 h-16 text-center text-5xl pt-2 bg-stone-100 border border-stone-300 shadow-inner shadow-stone-400 " +
+        (playable ? playableClasses : "")
+      }
       onClick={() => (playable ? tokenOnClick() : null)}
     >
       {token.value === 0 && "⚫"}

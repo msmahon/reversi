@@ -29,26 +29,33 @@ export default function Board({
             </div>
           ))}
         </div>
-        {board.map((row) =>
-          row.map((token) => (
-            <div key={crypto.randomUUID()}>
-              <span
-                key={crypto.randomUUID()}
-                className="absolute text-xs pl-1 pt-1 text-stone-400"
-              >
-                {alpha[token.column]}
-                {token.row + 1}
-              </span>
-              <Token
-                key={crypto.randomUUID()}
-                uuid={uuid}
-                token={token}
-                yourTurn={yourTurn}
-                errorSetter={errorSetter}
-              />
-            </div>
-          ))
-        )}
+        <div className="border-8 border-stone-400 shadow-md">
+          <div
+            id="board-container"
+            className={`grid grid-rows-${board.length} grid-cols-${board.length} content-baseline`}
+          >
+            {board.map((row) =>
+              row.map((token) => (
+                <div key={crypto.randomUUID()}>
+                  <span
+                    key={crypto.randomUUID()}
+                    className="absolute text-xs pl-1 pt-1 text-stone-400"
+                  >
+                    {alpha[token.column]}
+                    {token.row + 1}
+                  </span>
+                  <Token
+                    key={crypto.randomUUID()}
+                    uuid={uuid}
+                    token={token}
+                    yourTurn={yourTurn}
+                    errorSetter={errorSetter}
+                  />
+                </div>
+              ))
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );
