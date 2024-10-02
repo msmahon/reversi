@@ -13,13 +13,10 @@ type gameListLinksProps = {
 export default function GameListLinks({ gameList }: gameListLinksProps) {
   const pathname = usePathname();
   return (
-    <table className="table-auto">
+    <table className="table table-auto border-spacing-4 border-separate">
       <tbody>
         {gameList.map((game) => (
-          <tr key={game.id} className="text-red-600">
-            <td>
-              <a href={`/${game.id}`}>Game</a>
-            </td>
+          <tr key={game.id}>
             <td>
               {pathname.match(game.player1Id) ? (
                 "Player 1 "

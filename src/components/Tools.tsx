@@ -27,7 +27,7 @@ export default function Tools({ onNewGame }: toolsProps) {
     });
   }
   return (
-    <div id="toolbar" className="bg-stone-400 p-4 rounded-xl">
+    <div id="toolbar" className="bg-stone-400 p-4">
       <div className="flex justify-between">
         <div className="space-x-1">
           <Button onClick={newGame}>New</Button>

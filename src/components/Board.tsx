@@ -25,9 +25,9 @@ export default function Board({
   }
 
   return (
-    <div className="basis-2/3 p-4 flex justify-center items-center bg-stone-300">
+    <div className="p-4 flex justify-center items-center">
       {board?.length && (
-        <div className="mr-4 p-4 rounded-xl bg-stone-100 h-fit">
+        <div className="p-4 rounded-xl bg-stone-100 h-fit">
           <div className="border-8 border-stone-400 shadow-md">
             <div
               id="board-container"
