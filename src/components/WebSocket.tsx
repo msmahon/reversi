@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import Pusher from "pusher-js";
 
 type webSocketProps = {
@@ -7,8 +7,7 @@ type webSocketProps = {
 };
 
 export default function WebSocketComponent({ uuid, onPlayed }: webSocketProps) {
-  useEffect(() => {
-    // Make sure this runs on the client side
+  const connectToChannel = useCallback(function (uuid: string) {
     if (typeof window !== "undefined") {
       const pusher = new Pusher(process.env.NEXT_PUBLIC_PUSHER_KEY as string, {
         cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER as string,
@@ -23,5 +22,8 @@ export default function WebSocketComponent({ uuid, onPlayed }: webSocketProps) {
       };
     }
   }, []);
+  useEffect(() => {
+    connectToChannel(uuid);
+  }, [uuid, connectToChannel]);
   return null;
 }
