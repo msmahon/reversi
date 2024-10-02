@@ -3,7 +3,7 @@ import { Activity } from "@prisma/client";
 export type token = {
   row: number;
   column: number;
-  value: 0 | 1 | null;
+  value: 1 | 2 | null;
 };
 
 export type board = token[][];
@@ -23,7 +23,7 @@ export type gameData = {
   playableCells: playableVectors[];
   board: token[][];
   activityLog: Activity[];
-  winner: 0 | 1 | null | false;
+  winner: 1 | 2 | null | false;
 };
 
 export type gameLog = {

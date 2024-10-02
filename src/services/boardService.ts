@@ -35,14 +35,14 @@ export function generateBoard(size: number): board {
   // ⬜⚫️⚪️⬜
   // ⬜⚪️⚫️⬜
   // ⬜⬜⬜⬜
-  board[size / 2 - 1][size / 2 - 1].value = 0;
-  board[size / 2][size / 2 - 1].value = 1;
-  board[size / 2 - 1][size / 2].value = 1;
-  board[size / 2][size / 2].value = 0;
+  board[size / 2 - 1][size / 2 - 1].value = 1;
+  board[size / 2][size / 2 - 1].value = 2;
+  board[size / 2 - 1][size / 2].value = 2;
+  board[size / 2][size / 2].value = 1;
   return board;
 }
 
-export function getPlayableCells(board: board, turn: 0 | 1) {
+export function getPlayableCells(board: board, turn: 1 | 2) {
   // If player is using black tokens, these are the candidates (red)
   // ⬜⬜⬜⬜⬜⬜ Size 6
   // ⬜⬜🔴🔴🔴⬜
@@ -54,7 +54,7 @@ export function getPlayableCells(board: board, turn: 0 | 1) {
   // Empty cells bordering an opponents cells
   const candidateCells = board
     .flat(2)
-    .filter((c) => c.value === (turn === 0 ? 1 : 0))
+    .filter((c) => c.value === (turn === 1 ? 2 : 1))
     .reduce((previous, current) => {
       // Get all unplayed cells around token
       const candidateCells = getAdjacentCellCoordinates(board, current).filter(
@@ -122,7 +122,7 @@ export function getPlayableCells(board: board, turn: 0 | 1) {
 function getFlippableCellsAtVector(
   board: board,
   origin: token,
-  turn: 0 | 1,
+  turn: 1 | 2,
   vector: cardinalDirection
 ) {
   const arr = getCellsArrayAtVector(board, origin, vector);
@@ -130,7 +130,7 @@ function getFlippableCellsAtVector(
   // [⚪️, ⚪️, ⚫️, ⚫️, ⬜]
   if (arr.length === 0) return [];
   // first value must be other players token
-  if (arr[0].value !== (turn === 0 ? 1 : 0)) return [];
+  if (arr[0].value !== (turn === 1 ? 2 : 1)) return [];
 
   const firstMatch = arr.findIndex((token) => token.value === turn);
   if (firstMatch === -1) return [];
@@ -195,6 +195,6 @@ export function getAdjacentCellCoordinates(board: board, cell: token) {
   return adjacentTokens;
 }
 
-export function getScore(board: board, turn: 0 | 1) {
+export function getScore(board: board, turn: 1 | 2) {
   return board.flat(2).filter((cell) => cell.value == turn).length;
 }

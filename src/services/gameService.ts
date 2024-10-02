@@ -19,27 +19,27 @@ export async function getGameData(id: string): Promise<gameData | null> {
     // determine if a player is requesting the data
     // only add playable cells if it is that players turn
     let playableCells: playableVectors[] = [];
-    if (game.player1Id === id && game.turn === 0) {
-      playableCells = getPlayableCells(JSON.parse(game.board), 0);
-    }
-    if (game.player2Id === id && game.turn === 1) {
+    if (game.player1Id === id && game.turn === 1) {
       playableCells = getPlayableCells(JSON.parse(game.board), 1);
+    }
+    if (game.player2Id === id && game.turn === 2) {
+      playableCells = getPlayableCells(JSON.parse(game.board), 2);
     }
 
     return {
       id: game.id,
       player1: {
         id: game.player1Id,
-        score: getScore(JSON.parse(game.board), 0),
+        score: getScore(JSON.parse(game.board), 1),
       },
       player2: {
         id: game.player1Id,
-        score: getScore(JSON.parse(game.board), 1),
+        score: getScore(JSON.parse(game.board), 2),
       },
       playersTurn: game.turn,
       yourTurn:
-        (game.player1Id == id && game.turn == 0) ||
-        (game.player2Id == id && game.turn == 1),
+        (game.player1Id == id && game.turn == 1) ||
+        (game.player2Id == id && game.turn == 2),
       playableCells: playableCells,
       board: JSON.parse(game.board),
       activityLog: await getActivityLog(game.id),
@@ -101,15 +101,15 @@ export async function play(id: string, row: number, column: number) {
   if (!game?.id) throw new Error(`Game ${id} not found`);
   if (game.gameStatus !== "in progress") throw new Error("Game already over");
   if (game.id == id) throw new Error("Invalid id");
-  if (game.player1Id == id && game.turn != 0)
+  if (game.player1Id == id && game.turn != 1)
     throw new Error("It's not your turn");
-  if (game.player2Id == id && game.turn != 1)
+  if (game.player2Id == id && game.turn != 2)
     throw new Error("It's not your turn");
 
   // get playable cells and confirm played cell is allowed
   const playableCells = getPlayableCells(
     JSON.parse(game.board),
-    game.turn as 0 | 1
+    game.turn as 1 | 2
   );
 
   // const candidateCell =
@@ -127,11 +127,11 @@ export async function play(id: string, row: number, column: number) {
       },
       [playableCell.origin] as token[]
     );
-    await flipCells(game.id, game.turn as 0 | 1, flippedVectors);
+    await flipCells(game.id, game.turn as 1 | 2, flippedVectors);
   }
 }
 
-async function flipCells(id: string, turn: 0 | 1, tokens: token[]) {
+async function flipCells(id: string, turn: 1 | 2, tokens: token[]) {
   let game;
   try {
     game = await prisma.game.findUniqueOrThrow({
@@ -150,7 +150,7 @@ async function flipCells(id: string, turn: 0 | 1, tokens: token[]) {
   const board = JSON.parse(game.board) as token[][];
   tokens.forEach((token) => (board[token.row][token.column].value = turn));
 
-  const nextTurn = getNextTurn(board, turn === 1 ? 0 : 1);
+  const nextTurn = getNextTurn(board, turn === 1 ? 2 : 1);
 
   try {
     // console.log(board);
@@ -173,7 +173,7 @@ async function flipCells(id: string, turn: 0 | 1, tokens: token[]) {
   }
 }
 
-function getNextTurn(board: board, nextTurn: 0 | 1) {
+function getNextTurn(board: board, nextTurn: 1 | 2) {
   const allCellsPlayed =
     board.flat(2).filter((cell) => cell.value == null).length === 0;
   if (allCellsPlayed) return null;
@@ -184,12 +184,12 @@ function getNextTurn(board: board, nextTurn: 0 | 1) {
     // if the next player cannot play, check if the last player can play again
     const nextNextPlayableCells = getPlayableCells(
       board,
-      nextTurn === 1 ? 0 : 1
+      nextTurn === 1 ? 2 : 1
     );
     if (nextNextPlayableCells.length === 0) {
       return null;
     } else {
-      return nextTurn === 1 ? 0 : 1;
+      return nextTurn === 1 ? 2 : 1;
     }
   } else {
     return nextTurn;
@@ -197,8 +197,8 @@ function getNextTurn(board: board, nextTurn: 0 | 1) {
 }
 
 function checkWinState(board: board) {
-  const player1Score = getScore(board, 0);
-  const player2Score = getScore(board, 1);
+  const player1Score = getScore(board, 1);
+  const player2Score = getScore(board, 2);
   if (player1Score > player2Score) return "Player 1 wins!";
   if (player2Score > player1Score) return "Player 2 wins!";
   if (player1Score === player2Score) return "It's a tie!";

@@ -19,7 +19,7 @@ function generateBoardFromString(boardString: string): board {
         return {
           row: i,
           column: index,
-          value: emoji === "⚫" ? 0 : emoji === "⚪" ? 1 : null,
+          value: emoji === "⚫" ? 1 : emoji === "⚪" ? 2 : null,
         };
       })
     );

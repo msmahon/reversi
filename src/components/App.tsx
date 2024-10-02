@@ -52,7 +52,7 @@ export default function App({ uuid }: { uuid: string }) {
 
   const activityLog = useRef<gameLogType[]>([]);
   const board = useRef<token[][]>([]);
-  const turn = useRef<0 | 1>(0);
+  const turn = useRef<1 | 2>(1);
 
   async function fetchGameData() {
     fetch(`api/game/${uuid}`)

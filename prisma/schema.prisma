@@ -11,7 +11,7 @@ model Game {
   id          String      @id @default(uuid())
   player1Id   String      @unique @default(uuid())
   player2Id   String      @unique @default(uuid())
-  turn        Int?        @default(0)
+  turn        Int?        @default(1)
   gameStatus  String      @default("in progress")
   board       String
   passed      Boolean     @default(false)
