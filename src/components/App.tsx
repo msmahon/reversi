@@ -3,10 +3,8 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { gameData, gameLog, token } from "../../types";
 import GameListLinks from "@/components/GameListLinks";
-// import MoveHistory from "@/components/MoveHistory";
 import Board from "@/components/Board";
 import Tools from "@/components/Tools";
-import GameStatus from "@/components/GameStatus";
 import WebSocket from "@/components/WebSocket";
 import ScoreCard from "@/components/ScoreCard";
 
