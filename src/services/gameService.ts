@@ -1,7 +1,7 @@
 import prisma from "../app/client";
 import { generateBoard, getPlayableCells, getScore } from "./boardService";
 import { board, gameData, playableVectors, token } from "../../types";
-import { Activity } from "@prisma/client";
+import { Activity } from "prisma/prisma-client";
 import { broadcast } from "../../websocket";
 
 export async function getGameData(id: string): Promise<gameData | null> {

@@ -1,4 +1,4 @@
-import { Activity } from "@prisma/client";
+import { Activity } from "prisma/prisma-client";
 
 export type token = {
   row: number;
