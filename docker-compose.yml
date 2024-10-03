@@ -1,0 +1,15 @@
+version: "3.8"
+
+services:
+  nextjs:
+    build:
+      context: .
+    ports:
+      - "3000:3000" # Map container port to host port
+    volumes:
+      - .:/app # Mount the project directory into the container for live development
+      - /app/node_modules # Exclude node_modules to prevent conflicts
+    environment:
+      - NODE_ENV=development
+    stdin_open: true
+    tty: true
