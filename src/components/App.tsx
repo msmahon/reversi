@@ -15,9 +15,9 @@ type game = {
   gameStatus: string;
 };
 
-export default function App({ uuid }: { uuid: string }) {
+export default function App({ uuid }: { uuid?: string }) {
   const router = useRouter();
-  const [errors, setErrors] = useState<string[]>([]);
+  const [, setErrors] = useState<string[]>([]);
   const [gameData, setGameData] = useState<gameData | null>(null);
   const [gameList, setGameList] = useState<game[]>([]);
 
@@ -63,14 +63,14 @@ export default function App({ uuid }: { uuid: string }) {
       {uuid && <WebSocket uuid={uuid} onPlayed={handlePlayed} />}
 
       <Tools onNewGame={handleNewGame} />
-      {gameData && (
+      {gameData && uuid && (
         <div className="w-full flex items-center justify-center">
           <ScoreCard gameData={gameData} playerNumber={1} />
 
           <Board
             board={board.current}
             uuid={uuid}
-            playableCells={gameData.playableCells}
+            gameData={gameData}
             errorSetter={setErrors}
           />
 

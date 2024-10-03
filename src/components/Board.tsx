@@ -1,10 +1,10 @@
-import { playableVectors, token } from "../../types";
+import { gameData, token } from "../../types";
 import Token from "./Token";
 
 type boardPropTypes = {
   board: token[][];
   uuid: string;
-  playableCells: playableVectors[];
+  gameData: gameData;
   errorSetter: CallableFunction;
 };
 
@@ -13,11 +13,11 @@ const alpha = [...Array(26)].map((_, i) => String.fromCharCode(i + 65));
 export default function Board({
   board,
   uuid,
-  playableCells,
+  gameData,
   errorSetter,
 }: boardPropTypes) {
   function getPlayableVectors(token: token) {
-    const playableCell = playableCells.find(
+    const playableCell = gameData.playableCells.find(
       (cell) =>
         cell.origin.row === token.row && cell.origin.column === token.column
     );
