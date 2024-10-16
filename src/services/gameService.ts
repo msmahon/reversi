@@ -2,7 +2,7 @@ import prisma from "../app/client";
 import { generateBoard, getPlayableCells, getScore } from "./boardService";
 import { board, gameData, playableVectors, token } from "../../types";
 import { Activity } from "prisma/prisma-client";
-import { broadcast } from "../../websocket";
+import { broadcast } from "../services/websocketService";
 
 export async function getGameData(id: string): Promise<gameData | null> {
   try {
@@ -162,9 +162,7 @@ async function flipCells(id: string, turn: 1 | 2, tokens: token[]) {
       },
       where: { id: id },
     });
-    broadcast(game.id);
-    broadcast(game.player1Id);
-    broadcast(game.player2Id);
+    broadcast([game.player1Id, game.player2Id]);
     // TODO: wrap in transaction
   } catch (error) {
     console.error("Error:", error);
