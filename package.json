@@ -2,6 +2,7 @@
   "name": "reversi2",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -9,7 +10,8 @@
     "lint": "next lint",
     "migrate": "npx prisma migrate dev",
     "studio": "npx prisma studio",
-    "test": "vitest"
+    "test": "vitest",
+    "server": "nodemon websocket-server/index.js"
   },
   "dependencies": {
     "@prisma/client": "^5.19.1",
@@ -19,7 +21,8 @@
     "pusher": "^5.2.0",
     "pusher-js": "^8.4.0-rc2",
     "react": "^18",
-    "react-dom": "^18"
+    "react-dom": "^18",
+    "ws": "^8.18.0"
   },
   "devDependencies": {
     "@testing-library/dom": "^10.4.0",
@@ -28,6 +31,7 @@
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "@types/ws": "^8.5.12",
     "@vitejs/plugin-react": "^4.3.1",
     "eslint": "^8",
     "eslint-config-next": "14.2.12",
